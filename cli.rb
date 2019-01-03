@@ -7,7 +7,7 @@ require_relative 'app/models/user.rb'
 
 class Cli
 
-attr_reader :current_user, :last_input, :new_ingredient, :ready
+attr_reader :current_user, :last_input, :new_ingredient, :ready, :spoonacular_ids, :instructions, :recipe_instructions_array, :api_recipe_instructions, :spoon_id
 
   def self.welcome
     puts "Welcome to Empty Fridge"
@@ -43,18 +43,45 @@ attr_reader :current_user, :last_input, :new_ingredient, :ready
   end
 
   def self.recipe_array
-    count = 0
+    counter = 1
     @recipe_titles = []
+    @spoonacular_ids  = []
     @recipes.each do |recipe_hash|
       recipe_hash.each do |key, value|
         if key == "title"
-          count += 1
-          @recipe_titles << "#{count}. #{value}"
+          @spoonacular_ids << "#{recipe_hash["id"]}"
+          @recipe_titles << "#{counter}. #{value}"
+          counter += 1
         end
       end
     end
       puts @recipe_titles
   end
+
+def self.get_instructions_for_api
+  @api_recipe_instructions = "#{@spoon_id}/information"
+
+end
+
+  def self.obtain_recipe_instructions
+    response = Unirest.get "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/" + "#{@api_recipe_instructions}",
+ headers:{
+   "X-RapidAPI-Key" => "zg9YxzyhyGmshCEUn9o7xW7quDu9p1hy8Hpjsn2c6XXgmzXb1R"}
+ @instructions = response.body
+
+end
+
+def self.instructions_array
+  @recipe_instructions_array = []
+  @instructions.each do |key, value|
+      if key == "instructions"
+        @recipe_instructions_array << "#{value}"
+      end
+
+    puts @recipe_instructions_array.uniq
+end
+
+end
 
 def self.save_recipe_to_cookbook
 puts 'Enter recipe number to save to your cookbook'
@@ -62,27 +89,28 @@ user_input = gets.chomp
 case user_input.to_i
   when 1
     recipe_name = @recipe_titles[0].slice(3, @recipe_titles[0].length - 1)
-    recipe = Recipe.create(:name => "#{recipe_name}")
+    spoonacular_id =
+    recipe = Recipe.create(:name => "#{recipe_name}", :spoonacular_id => "#{@spoonacular_ids[0]}")
     @current_user.recipes << recipe
     puts "Recipe Saved"
   when 2
     recipe_name = @recipe_titles[1].slice(3, @recipe_titles[0].length - 1)
-    recipe = Recipe.create(:name => "#{recipe_name}")
+    recipe = Recipe.create(:name => "#{recipe_name}", :spoonacular_id => "#{@spoonacular_ids[1]}")
     @current_user.recipes << recipe
     puts "Recipe Saved"
   when 3
     recipe_name = @recipe_titles[2].slice(3, @recipe_titles[0].length - 1)
-    recipe = Recipe.create(:name => "#{recipe_name}")
+    recipe = Recipe.create(:name => "#{recipe_name}", :spoonacular_id => "#{@spoonacular_ids[2]}")
     @current_user.recipes << recipe
     puts "Recipe Saved"
   when 4
     recipe_name = @recipe_titles[3].slice(3, @recipe_titles[0].length - 1)
-    recipe = Recipe.create(:name => "#{recipe_name}")
+    recipe = Recipe.create(:name => "#{recipe_name}", :spoonacular_id => "#{@spoonacular_ids[3]}")
     @current_user.recipes << recipe
     puts "Recipe Saved"
   when 5
     recipe_name = @recipe_titles[4].slice(3, @recipe_titles[0].length - 1)
-    recipe = Recipe.create(:name => "#{recipe_name}")
+    recipe = Recipe.create(:name => "#{recipe_name}", :spoonacular_id => "#{@spoonacular_ids[4]}")
     @current_user.recipes << recipe
     puts "Recipe Saved"
   end
@@ -93,9 +121,15 @@ def self.browse_recipes_in_cookbook
   saved_recipe_list = @current_user.recipes
   recipe_list = []
   saved_recipe_list.each do |recipe|
-        recipe_list << "#{recipe.name}"
+        recipe_list << "#{recipe.spoonacular_id} - #{recipe.name}"
       end
     puts recipe_list.uniq
+    puts "Enter a recipe number to view instructions"
+    user_input = gets.chomp
+    @spoon_id = user_input
+    Cli.get_instructions_for_api
+    Cli.obtain_recipe_instructions
+    Cli.instructions_array
 end
 
   def self.menu
@@ -103,8 +137,28 @@ end
     puts '1. Enter or add an ingredient'
     puts '2. Search for new recipes from your ingredients'
     puts '3. Browse saved recipes in your cookbook'
-    puts '4. Exit the programme'
+    puts '4. View your current ingredients'
+    puts '5. Delete an ingredient'
+    puts '6. Exit the programme'
     Cli.loop
+  end
+
+  def self.delete_ingredient
+    ingredients = Cli.get_users_ingredients
+    puts "Enter name of ingredient you would like to delete"
+    user_input = gets.chomp
+    @current_user.ingredients.where(name: "#{user_input}").destroy_all
+  end
+
+  def self.view_ingredients
+    # user_ingredients_array = Cli.get_users_ingredients
+    # puts "#{user_ingredients_array}"
+    user_ingredients_array = @current_user.ingredients
+    ingredients_list = []
+    user_ingredients_array.each do |ingredient|
+        ingredients_list << "#{ingredient.name}"
+        end
+      puts ingredients_list.uniq
   end
 
   def self.loop
@@ -126,9 +180,19 @@ end
       when 3
         Cli.browse_recipes_in_cookbook
         sleep(5)
+
         Cli.menu
         break
       when 4
+        Cli.view_ingredients
+        Cli.menu
+        break
+      when 5
+        Cli.delete_ingredient
+        sleep(5)
+        Cli.menu
+        break
+      when 6
         Cli.bye
         break
       end
@@ -163,7 +227,7 @@ end
       puts  "░░░░░░░░░░░░░░░▀▀▀▀▀▀░░░░░░░░░░░░░░░░░░"
       sleep(0.1)
       puts  "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
-      
+
     end
 
 end

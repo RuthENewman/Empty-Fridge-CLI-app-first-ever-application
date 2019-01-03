@@ -10,6 +10,7 @@ class UsersIngredientsRecipesUsersingredientsRecipesingredients < ActiveRecord::
 
     create_table :recipes do |t|
       t.string :name
+      t.string :spoonacular_id
     end
 
     create_table :user_ingredients do |t|
