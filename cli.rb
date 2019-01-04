@@ -11,16 +11,16 @@ class Cli
 attr_reader :current_user, :last_input, :new_ingredient, :ready, :spoonacular_ids, :instructions, :api_recipe_instructions, :spoon_id, :user_ingredients_array
 
   def self.welcome
-    puts" _______  __   __  _______  _______  __   __    _______  ______    ___   ______   _______  _______ "
-    puts"|       ||  |_|  ||       ||       ||  | |  |  |       ||    _ |  |   | |      | |       ||       |"
-    puts"|    ___||       ||    _  ||_     _||  |_|  |  |    ___||   | ||  |   | |  _    ||    ___||    ___|"
-    puts"|   |___ |       ||   |_| |  |   |  |       |  |   |___ |   |_||_ |   | | | |   ||   | __ |   |___ "
-    puts"|    ___||       ||    ___|  |   |  |_     _|  |    ___||    __  ||   | | |_|   ||   ||  ||    ___|"
-    puts"|   |___ | ||_|| ||   |      |   |    |   |    |   |    |   |  | ||   | |       ||   |_| ||   |___ "
-    puts"|_______||_|   |_||___|      |___|    |___|    |___|    |___|  |_||___| |______| |_______||_______|"
-    puts "-"*202
-    puts "Welcome to Empty Fridge. Reduce waste by finding recipes based on the ingredients you already have."
-    puts "-"*202
+    puts" _______  __   __  _______  _______  __   __    _______  ______    ___   ______   _______  _______ ".light_blue
+    puts"|       ||  |_|  ||       ||       ||  | |  |  |       ||    _ |  |   | |      | |       ||       |".light_blue
+    puts"|    ___||       ||    _  ||_     _||  |_|  |  |    ___||   | ||  |   | |  _    ||    ___||    ___|".light_blue
+    puts"|   |___ |       ||   |_| |  |   |  |       |  |   |___ |   |_||_ |   | | | |   ||   | __ |   |___ ".light_blue
+    puts"|    ___||       ||    ___|  |   |  |_     _|  |    ___||    __  ||   | | |_|   ||   ||  ||    ___|".light_blue
+    puts"|   |___ | ||_|| ||   |      |   |    |   |    |   |    |   |  | ||   | |       ||   |_| ||   |___ ".light_blue
+    puts"|_______||_|   |_||___|      |___|    |___|    |___|    |___|  |_||___| |______| |_______||_______|".light_blue
+    puts ("-"*202).light_blue
+    puts "Welcome to Empty Fridge. Reduce waste by finding recipes based on the ingredients you already have.".light_blue
+    puts ("-"*202).light_blue
     puts "Enter your name:".yellow
     user_input = gets.chomp
     @current_user = User.find_or_create_by(:name => user_input)
@@ -31,7 +31,8 @@ attr_reader :current_user, :last_input, :new_ingredient, :ready, :spoonacular_id
     puts""
     puts "Enter an ingredient".yellow
     user_input = gets.chomp
-    @new_ingredient = Ingredient.find_or_create_by(:name => user_input)
+    user_input_cap = user_input.capitalize
+    @new_ingredient = Ingredient.find_or_create_by(:name => user_input_cap)
     @current_user.ingredients << @new_ingredient
     puts "#{@new_ingredient.name} has been added to your list of ingredients."
   end
@@ -196,7 +197,7 @@ def self.browse_recipes_in_cookbook
 
   def self.loop
     user_input = gets.chomp
-    while user_input != ""
+    while user_input != " "
     case user_input.to_i
       when 1
         Cli.ingredient
