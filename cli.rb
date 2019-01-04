@@ -174,7 +174,8 @@ def self.browse_recipes_in_cookbook
     Cli.view_ingredients
     puts "Enter name of ingredient you would like to delete".yellow
     user_input = gets.chomp
-    @current_user.ingredients.where(name: "#{user_input}").destroy_all
+    user_input_cap = user_input.capitalize
+    @current_user.ingredients.where(name: "#{user_input_cap}").destroy_all
   end
 
   def self.view_ingredients
