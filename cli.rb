@@ -7,7 +7,7 @@ require_relative 'app/models/user.rb'
 
 class Cli
 
-attr_reader :current_user, :last_input, :new_ingredient, :ready, :spoonacular_ids, :instructions, :recipe_instructions_array, :api_recipe_instructions, :spoon_id
+attr_reader :current_user, :last_input, :new_ingredient, :ready, :spoonacular_ids, :instructions, :api_recipe_instructions, :spoon_id
 
   def self.welcome
     puts "Welcome to Empty Fridge"
@@ -68,17 +68,13 @@ end
  headers:{
    "X-RapidAPI-Key" => "zg9YxzyhyGmshCEUn9o7xW7quDu9p1hy8Hpjsn2c6XXgmzXb1R"}
  @instructions = response.body
-
 end
 
 def self.instructions_array
-  @recipe_instructions_array = []
   @instructions.each do |key, value|
       if key == "instructions"
-        @recipe_instructions_array << "#{value}"
+        puts value
       end
-
-    puts @recipe_instructions_array.uniq
 end
 
 end
@@ -124,13 +120,18 @@ def self.browse_recipes_in_cookbook
         recipe_list << "#{recipe.spoonacular_id} - #{recipe.name}"
       end
     puts recipe_list.uniq
+  end
+
+
+  def self.retrieve_instructions
     puts "Enter a recipe number to view instructions"
     user_input = gets.chomp
     @spoon_id = user_input
     Cli.get_instructions_for_api
     Cli.obtain_recipe_instructions
     Cli.instructions_array
-end
+  end
+
 
   def self.menu
     puts 'What would you like to do now?'
@@ -179,8 +180,7 @@ end
         break
       when 3
         Cli.browse_recipes_in_cookbook
-        sleep(5)
-
+        Cli.retrieve_instructions
         Cli.menu
         break
       when 4
@@ -189,12 +189,14 @@ end
         break
       when 5
         Cli.delete_ingredient
-        sleep(5)
         Cli.menu
         break
       when 6
         Cli.bye
         break
+      else
+        puts "Please enter valid menu option (1-6)"
+        Cli.menu
       end
     end
   end
