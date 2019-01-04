@@ -164,12 +164,11 @@ def self.browse_recipes_in_cookbook
 
   def self.loop
     user_input = gets.chomp
-    while user_input != ""
+    until user_input.to_i == 6
     case user_input.to_i
       when 1
         Cli.ingredient
         Cli.menu
-        break
       when 2
         Cli.get_users_ingredients
         Cli.ingredients_for_api
@@ -177,27 +176,22 @@ def self.browse_recipes_in_cookbook
         Cli.recipe_array
         Cli.save_recipe_to_cookbook
         Cli.menu
-        break
       when 3
         Cli.browse_recipes_in_cookbook
         Cli.retrieve_instructions
         Cli.menu
-        break
       when 4
         Cli.view_ingredients
         Cli.menu
-        break
       when 5
         Cli.delete_ingredient
         Cli.menu
-        break
-      when 6
-        Cli.bye
-        break
       else
         puts "Please enter valid menu option (1-6)"
         Cli.menu
       end
+      Cli.bye
+      break
     end
   end
 
