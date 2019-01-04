@@ -8,7 +8,7 @@ require 'colorize'
 
 class Cli
 
-attr_reader :current_user, :last_input, :new_ingredient, :ready, :spoonacular_ids, :instructions, :api_recipe_instructions, :spoon_id
+attr_reader :current_user, :last_input, :new_ingredient, :ready, :spoonacular_ids, :instructions, :api_recipe_instructions, :spoon_id, :user_ingredients_array
 
   def self.welcome
     puts" _______  __   __  _______  _______  __   __    _______  ______    ___   ______   _______  _______ "
@@ -28,6 +28,7 @@ attr_reader :current_user, :last_input, :new_ingredient, :ready, :spoonacular_id
   end
 
   def self.ingredient
+    puts""
     puts "Enter an ingredient".yellow
     user_input = gets.chomp
     @new_ingredient = Ingredient.find_or_create_by(:name => user_input)
@@ -132,7 +133,9 @@ def self.browse_recipes_in_cookbook
   saved_recipe_list.each do |recipe|
         recipe_list << "#{recipe.spoonacular_id} - #{recipe.name}"
       end
+      puts "-"*202
     puts recipe_list.uniq
+    puts "-"*202
   end
 
 
@@ -159,21 +162,28 @@ def self.browse_recipes_in_cookbook
   end
 
   def self.delete_ingredient
-    ingredients = Cli.get_users_ingredients
+
+    #puts Cli.view_ingredients
+    Cli.view_ingredients
     puts "Enter name of ingredient you would like to delete".yellow
     user_input = gets.chomp
     @current_user.ingredients.where(name: "#{user_input}").destroy_all
   end
 
   def self.view_ingredients
-    # user_ingredients_array = Cli.get_users_ingredients
-    # puts "#{user_ingredients_array}"
-    user_ingredients_array = @current_user.ingredients
-    ingredients_list = []
-    user_ingredients_array.each do |ingredient|
-        ingredients_list << "#{ingredient.name}"
-        end
-      puts ingredients_list.uniq
+    x =  @current_user.ingredients.all.map { |x| x.name}.uniq
+    puts x
+    # @user_ingredients_array = @current_user.ingredients
+    #
+    # ingredients_list = []
+    # @user_ingredients_array.each do |ingredient|
+    #     ingredients_list << "#{ingredient.name}"
+    #     end
+    #     puts "-"*202
+    #   print ingredients_list.uniq.join(", ")
+    #   puts""
+    #   puts "-"*202
+
   end
 
   def self.loop
@@ -188,7 +198,9 @@ def self.browse_recipes_in_cookbook
         Cli.get_users_ingredients
         Cli.ingredients_for_api
         Cli.obtain_recipe
+        puts "-"*202
         Cli.recipe_array
+        puts "-"*202
         puts "Enter Q to return to menu"
         Cli.save_recipe_to_cookbook
         Cli.menu
