@@ -83,9 +83,15 @@ end
   def self.instructions_array
     @instructions.each do |key, value|
         if key == "instructions"
+          if value == nil
+            puts "-"*202
+            puts "Sorry recipe not currently available"
+            puts "-"*202
+          else
           puts "-"*202
           puts value
           puts "-"*202
+        end
         end
   end
 
@@ -172,7 +178,9 @@ def self.browse_recipes_in_cookbook
 
   def self.view_ingredients
     x =  @current_user.ingredients.all.map { |x| x.name}.uniq
+    puts "-"*202
     puts x
+    puts "-"*202
     # @user_ingredients_array = @current_user.ingredients
     #
     # ingredients_list = []
