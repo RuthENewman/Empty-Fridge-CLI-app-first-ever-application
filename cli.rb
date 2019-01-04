@@ -120,6 +120,8 @@ case user_input.to_i
     recipe = Recipe.create(:name => "#{recipe_name}", :spoonacular_id => "#{@spoonacular_ids[4]}")
     @current_user.recipes << recipe
     puts "Recipe Saved"
+  when "Q"
+    Cli.menu
   end
 
 end
@@ -187,6 +189,7 @@ def self.browse_recipes_in_cookbook
         Cli.ingredients_for_api
         Cli.obtain_recipe
         Cli.recipe_array
+        puts "Enter Q to return to menu"
         Cli.save_recipe_to_cookbook
         Cli.menu
         break
