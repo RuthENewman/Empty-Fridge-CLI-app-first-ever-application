@@ -37,7 +37,6 @@ attr_reader :current_user, :last_input, :new_ingredient, :ready, :spoonacular_id
 
   def self.get_users_ingredients
     @user_ingredients_array = @current_user.ingredients.all.map { |x| x.name}.uniq
-    puts "#{@user_ingredients_array}"
   end
 
   def self.ingredients_for_api
@@ -138,7 +137,8 @@ def self.browse_recipes_in_cookbook
   def self.retrieve_instructions
     puts "Enter a recipe number to view instructions".yellow
     user_input = gets.chomp
-    @spoon_id = user_input
+    user_input_downcase = user_input.downcase
+    @spoon_id = user_input_downcase
     Cli.get_instructions_for_api
     Cli.obtain_recipe_instructions
     Cli.instructions_array
