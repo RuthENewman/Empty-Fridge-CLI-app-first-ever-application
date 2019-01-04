@@ -3,6 +3,7 @@ require 'net/http'
 require 'open-uri'
 require 'unirest'
 require_relative 'app/models/user.rb'
+require 'colorize'
 
 
 class Cli
@@ -10,15 +11,24 @@ class Cli
 attr_reader :current_user, :last_input, :new_ingredient, :ready, :spoonacular_ids, :instructions, :api_recipe_instructions, :spoon_id
 
   def self.welcome
-    puts "Welcome to Empty Fridge"
-    puts "Enter your name:"
+    puts" _______  __   __  _______  _______  __   __    _______  ______    ___   ______   _______  _______ "
+    puts"|       ||  |_|  ||       ||       ||  | |  |  |       ||    _ |  |   | |      | |       ||       |"
+    puts"|    ___||       ||    _  ||_     _||  |_|  |  |    ___||   | ||  |   | |  _    ||    ___||    ___|"
+    puts"|   |___ |       ||   |_| |  |   |  |       |  |   |___ |   |_||_ |   | | | |   ||   | __ |   |___ "
+    puts"|    ___||       ||    ___|  |   |  |_     _|  |    ___||    __  ||   | | |_|   ||   ||  ||    ___|"
+    puts"|   |___ | ||_|| ||   |      |   |    |   |    |   |    |   |  | ||   | |       ||   |_| ||   |___ "
+    puts"|_______||_|   |_||___|      |___|    |___|    |___|    |___|  |_||___| |______| |_______||_______|"
+    puts "-"*202
+    puts "Welcome to Empty Fridge. Reduce waste by finding recipes based on the ingredients you already have."
+    puts "-"*202
+    puts "Enter your name:".yellow
     user_input = gets.chomp
     @current_user = User.find_or_create_by(:name => user_input)
     puts "Welcome #{@current_user.name}"
   end
 
   def self.ingredient
-    puts "Enter an ingredient"
+    puts "Enter an ingredient".yellow
     user_input = gets.chomp
     @new_ingredient = Ingredient.find_or_create_by(:name => user_input)
     @current_user.ingredients << @new_ingredient
@@ -70,17 +80,19 @@ end
  @instructions = response.body
 end
 
-def self.instructions_array
-  @instructions.each do |key, value|
-      if key == "instructions"
-        puts value
-      end
-end
+  def self.instructions_array
+    @instructions.each do |key, value|
+        if key == "instructions"
+          puts "-"*202
+          puts value
+          puts "-"*202
+        end
+  end
 
 end
 
 def self.save_recipe_to_cookbook
-puts 'Enter recipe number to save to your cookbook'
+puts 'Enter recipe number to save to your cookbook'.yellow
 user_input = gets.chomp
 case user_input.to_i
   when 1
@@ -124,7 +136,7 @@ def self.browse_recipes_in_cookbook
 
 
   def self.retrieve_instructions
-    puts "Enter a recipe number to view instructions"
+    puts "Enter a recipe number to view instructions".yellow
     user_input = gets.chomp
     @spoon_id = user_input
     Cli.get_instructions_for_api
@@ -134,19 +146,19 @@ def self.browse_recipes_in_cookbook
 
 
   def self.menu
-    puts 'What would you like to do now?'
-    puts '1. Enter or add an ingredient'
-    puts '2. Search for new recipes from your ingredients'
-    puts '3. Browse saved recipes in your cookbook'
-    puts '4. View your current ingredients'
-    puts '5. Delete an ingredient'
-    puts '6. Exit the programme'
+    puts 'What would you like to do now?'.green
+    puts '1. Enter or add an ingredient'.green
+    puts '2. Search for new recipes from your ingredients'.green
+    puts '3. Browse saved recipes in your cookbook'.green
+    puts '4. View your current ingredients'.green
+    puts '5. Delete an ingredient'.green
+    puts '6. Exit the programme'.green
     Cli.loop
   end
 
   def self.delete_ingredient
     ingredients = Cli.get_users_ingredients
-    puts "Enter name of ingredient you would like to delete"
+    puts "Enter name of ingredient you would like to delete".yellow
     user_input = gets.chomp
     @current_user.ingredients.where(name: "#{user_input}").destroy_all
   end
@@ -164,11 +176,12 @@ def self.browse_recipes_in_cookbook
 
   def self.loop
     user_input = gets.chomp
-    until user_input.to_i == 6
+    while user_input != ""
     case user_input.to_i
       when 1
         Cli.ingredient
         Cli.menu
+        break
       when 2
         Cli.get_users_ingredients
         Cli.ingredients_for_api
@@ -176,65 +189,60 @@ def self.browse_recipes_in_cookbook
         Cli.recipe_array
         Cli.save_recipe_to_cookbook
         Cli.menu
+        break
       when 3
         Cli.browse_recipes_in_cookbook
         Cli.retrieve_instructions
         Cli.menu
+        break
       when 4
         Cli.view_ingredients
         Cli.menu
+        break
       when 5
         Cli.delete_ingredient
         Cli.menu
+        break
+      when 6
+        Cli.bye
+        break
       else
-        puts "Please enter valid menu option (1-6)"
+        puts "Please enter valid menu option (1-6)".yellow
         Cli.menu
+        break
       end
-      Cli.bye
-      break
     end
   end
 
     def self.bye
-      puts  "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
+      puts  "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░".red
       sleep(0.1)
-      puts  "░░░▄▄▀▀▀▀▀▄░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
+      puts  "░░░▄▄▀▀▀▀▀▄░░░░░░░░░░░░░░░░░░░░░░░░░░░░".red
       sleep(0.1)
-      puts  "░░▄▀░░░░░░░▀▄░░░░░░░░░░░░░░░░░░░░░░░░░░"
+      puts  "░░▄▀░░░░░░░▀▄░░░░░░░░░░░░░░░░░░░░░░░░░░".red
       sleep(0.1)
-      puts  "░▄▀░░░▄▄░░░░▀▀▀▀▀▀▀▄▄▀▀▀▀▀▀▀▀▀▀▀▀▄▄░░░░"
+      puts  "░▄▀░░░▄▄░░░░▀▀▀▀▀▀▀▄▄▀▀▀▀▀▀▀▀▀▀▀▀▄▄░░░░".red
       sleep(0.1)
-      puts  "░█░░░░██░░░░░░░░░░░░░░░░░░░░░░░░░░░▀▄░░"
+      puts  "░█░░░░██░░░░░░░░░░░░░░░░░░░░░░░░░░░▀▄░░".red
       sleep(0.1)
-      puts  "░█░░░░██▄████▄░██▄░░░░▄██░▄████▄░░░░▀▄░"
+      puts  "░█░░░░██▄████▄░██▄░░░░▄██░▄████▄░░░░▀▄░".red
       sleep(0.1)
-      puts  "░█░░░░██▀░░▀██▄░██▄░░██▀░██▀░▄██░░░░░█░"
+      puts  "░█░░░░██▀░░▀██▄░██▄░░██▀░██▀░▄██░░░░░█░".red
       sleep(0.1)
-      puts  "░█░░░░███▄▄███▀░░░▀██▀░░░▀██▄▄▄██░░░░█░"
+      puts  "░█░░░░███▄▄███▀░░░▀██▀░░░▀██▄▄▄██░░░░█░".red
       sleep(0.1)
-      puts  "░▀▄░░░░▀▀▀▀▀▀░░░░░██▀░░░░░░▀▀▀▀▀░░░░░█░"
+      puts  "░▀▄░░░░▀▀▀▀▀▀░░░░░██▀░░░░░░▀▀▀▀▀░░░░░█░".red
       sleep(0.1)
-      puts  "░░▀▄░░░░░░░░░░░░░██▀░░░▄▄░░░░░░░░░▄▄▀░░"
+      puts  "░░▀▄░░░░░░░░░░░░░██▀░░░▄▄░░░░░░░░░▄▄▀░░".red
       sleep(0.1)
-      puts  "░░░░▀▀▀▀▀▀▀▀▀▄░░░▀▀░░░▄▀░▀▀▀▀▀▀▀▀▀░░░░░"
+      puts  "░░░░▀▀▀▀▀▀▀▀▀▄░░░▀▀░░░▄▀░▀▀▀▀▀▀▀▀▀░░░░░".red
       sleep(0.1)
-      puts  "░░░░░░░░░░░░░▀▄░░░░░░▄▀░░░░░░░░░░░░░░░░"
+      puts  "░░░░░░░░░░░░░▀▄░░░░░░▄▀░░░░░░░░░░░░░░░░".red
       sleep(0.1)
-      puts  "░░░░░░░░░░░░░░░▀▀▀▀▀▀░░░░░░░░░░░░░░░░░░"
+      puts  "░░░░░░░░░░░░░░░▀▀▀▀▀▀░░░░░░░░░░░░░░░░░░".red
       sleep(0.1)
-      puts  "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
+      puts  "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░".red
 
     end
 
 end
-
-
-Cli.welcome
-Cli.menu
-# Cli.ingredient
-# Cli.get_users_ingredients
-# Cli.ingredients_for_api
-# Cli.obtain_recipe
-# Cli.recipe_array
-# Cli.save_recipe_to_cookbook
-# Cli.browse_recipes_in_cookbook
